@@ -29,9 +29,9 @@ jobs:
           # Try to compile main app files
           if [ -s swift_files.txt ]; then
             echo "Compiling $(wc -l < swift_files.txt) Swift files..."
-            # Try compiling CompleteApp.swift first (full Wine integration)
-            if [ -f WinIos/CompleteApp.swift ]; then
-              echo "Trying CompleteApp.swift compilation..."
+            # Try compiling App.swift (now contains complete Wine integration)
+            if [ -f WinIos/App.swift ]; then
+              echo "Trying App.swift compilation with full Wine integration..."
               swiftc -o build/Release-iphoneos/WinIos \
                 -sdk $(xcrun --sdk iphoneos --show-sdk-path) \
                 -target arm64-apple-ios17.0 \
@@ -40,9 +40,9 @@ jobs:
                 -framework UIKit \
                 -framework SwiftUI \
                 -framework UniformTypeIdentifiers \
-                WinIos/CompleteApp.swift || echo "CompleteApp.swift compilation failed"
+                WinIos/App.swift || echo "App.swift compilation failed"
             else
-              echo "CompleteApp.swift not found"
+              echo "App.swift not found"
             fi
           else
             echo "No Swift files found to compile"
