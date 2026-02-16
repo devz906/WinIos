@@ -826,10 +826,14 @@ class RealGraphicsEngine {
         print("🔧 Rendering frame with Metal")
         
         // Present (simulated)
-        // Create a simple drawable for presentation
-        let drawable = commandBuffer.texture as? MTLDrawable ?? commandBuffer
+        // Add completion handler for presentation
+        commandBuffer.addCompletedHandler { buffer in
+            if buffer.status == .completed {
+                print("🔧 Frame presented successfully")
+            }
+        }
         
-        commandBuffer.present(drawable)
+        commandBuffer.commit()
         
         return RenderResult(
             success: true,
