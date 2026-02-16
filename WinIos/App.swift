@@ -197,7 +197,7 @@ class PELoader {
         }
         
         // Parse COFF header
-        let headerOffset = peOffset + 4
+        let headerOffset = Int(peOffset) + 4
         return data.withUnsafeBytes { bytes in
             PEHeader(
                 signature: "PE\0\0",
