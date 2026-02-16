@@ -826,7 +826,10 @@ class RealGraphicsEngine {
         print("🔧 Rendering frame with Metal")
         
         // Present (simulated)
-        commandBuffer.present(nil)
+        // Create a simple drawable for presentation
+        let drawable = commandBuffer.texture as? MTLDrawable ?? commandBuffer
+        
+        commandBuffer.present(drawable)
         
         return RenderResult(
             success: true,
