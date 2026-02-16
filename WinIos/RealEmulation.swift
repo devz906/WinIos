@@ -163,7 +163,7 @@ class Realx86Emulator {
     
     private func executeCompiled(_ compiled: CompiledInstruction) -> CompiledResult {
         // Execute JIT compiled code
-        return compiled.execute(registers: registers, memory: memory)
+        return compiled.execute(registers, memory)
     }
     
     func stop() {
@@ -327,7 +327,7 @@ enum Operand {
 
 // MARK: - Instruction Executor
 class InstructionExecutor {
-    private let registers: x86Registers
+    private var registers: x86Registers
     private let memory: VirtualMemory
     
     init(registers: x86Registers, memory: VirtualMemory) {
@@ -826,7 +826,7 @@ class RealGraphicsEngine {
         print("🔧 Rendering frame with Metal")
         
         // Present (simulated)
-        commandBuffer.present()
+        commandBuffer.present(nil)
         
         return RenderResult(
             success: true,
