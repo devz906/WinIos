@@ -67,10 +67,14 @@ jobs:
             echo '    }' >> /tmp/App.swift
             echo '}' >> /tmp/App.swift
             echo '' >> /tmp/App.swift
+            echo 'import SwiftUI' >> /tmp/App.swift
+            echo '' >> /tmp/App.swift
             echo '@main' >> /tmp/App.swift
-            echo 'struct App {' >> /tmp/App.swift
-            echo '    static func main() {' >> /tmp/App.swift
-            echo '        UIApplicationMain(CommandLine.argc, CommandLine.unsafeArgv, nil, NSStringFromClass(AppDelegate.self))' >> /tmp/App.swift
+            echo 'struct WinIosApp: App {' >> /tmp/App.swift
+            echo '    var body: some Scene {' >> /tmp/App.swift
+            echo '        WindowGroup {' >> /tmp/App.swift
+            echo '            Text("WinIos - Windows Emulator")' >> /tmp/App.swift
+            echo '        }' >> /tmp/App.swift
             echo '    }' >> /tmp/App.swift
             echo '}' >> /tmp/App.swift
             swiftc -o Payload/WinIos.app/WinIos \
@@ -79,6 +83,7 @@ jobs:
               -O \
               -framework Foundation \
               -framework UIKit \
+              -framework SwiftUI \
               /tmp/App.swift
             chmod 755 Payload/WinIos.app/WinIos
           fi
