@@ -443,15 +443,23 @@ struct ContentView: View {
     }
     
     func testApp(_ appName: String) {
+        // Create container if needed
+        if currentContainer == nil {
+            currentContainer = WineEngine.WineContainer(name: "Default")
+        }
+        
+        guard let container = currentContainer else { return }
+        
         isRunning = true
         consoleOutput = "🍷 Testing \(appName) with Wine...\n"
-        consoleOutput += "🍷 Starting Wine emulation...\n"
+        consoleOutput += "🍷 Container: \(container.name)\n"
+        consoleOutput += "🍷 Resolution: \(wineConfig.desktopResolution)\n"
+        consoleOutput += "🍷 Starting Wine Engine...\n"
         consoleOutput += "🍷 Loading: \(appName)\n"
-        consoleOutput += "🍷 Initializing Wine layer...\n"
-        consoleOutput += "🍷 Setting up Windows environment...\n"
+        consoleOutput += "🍷 Initializing Wine environment...\n"
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-            let result = wineLauncher.launch(exePath: appName)
+            let result = wineEngine.execute(exePath: appName, in: container, config: wineConfig)
             consoleOutput += result.message + "\n"
             
             DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
@@ -515,6 +523,7 @@ struct WineSettingsView: View {
                             Text(version).tag(version)
                         }
                     }
+                    .pickerStyle(MenuPickerStyle())
                 }
                 
                 Section(header: Text("Display Settings")) {
@@ -523,12 +532,14 @@ struct WineSettingsView: View {
                             Text(resolution).tag(resolution)
                         }
                     }
+                    .pickerStyle(MenuPickerStyle())
                     
                     Picker("Graphics Driver", selection: $config.graphicsDriver) {
                         ForEach(graphicsDrivers, id: \.self) { driver in
                             Text(driver).tag(driver)
                         }
                     }
+                    .pickerStyle(MenuPickerStyle())
                 }
                 
                 Section(header: Text("Audio Settings")) {
@@ -537,6 +548,7 @@ struct WineSettingsView: View {
                             Text(driver).tag(driver)
                         }
                     }
+                    .pickerStyle(MenuPickerStyle())
                 }
                 
                 Section(header: Text("Container Management")) {

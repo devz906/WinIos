@@ -44,7 +44,7 @@ jobs:
                 -framework UIKit \
                 -framework SwiftUI \
                 -framework UniformTypeIdentifiers \
-                WinIos/App.swift
+                WinIos/*.swift
               if [ -f build/Release-iphoneos/WinIos ]; then
                 echo "✅ App.swift compilation succeeded!"
                 ls -la build/Release-iphoneos/WinIos
