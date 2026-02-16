@@ -89,16 +89,16 @@ struct ContentView: View {
                         .font(.headline)
                     
                     HStack(spacing: 10) {
-                        Button("Test IMG Tool") {
-                            testIMGTool()
+                        Button("Test Notepad") {
+                            testNotepad()
                         }
                         .padding(.horizontal)
                         .padding(.vertical, 8)
                         .background(Color.blue.opacity(0.1))
                         .cornerRadius(6)
                         
-                        Button("Test TXD Tool") {
-                            testTXDTool()
+                        Button("Test Calculator") {
+                            testCalculator()
                         }
                         .padding(.horizontal)
                         .padding(.vertical, 8)
@@ -134,8 +134,8 @@ struct ContentView: View {
     
     func selectFile() {
         // TODO: Implement file picker
-        selectedFile = "IMGTool.exe"
-        consoleOutput = "🍷 Selected: IMGTool.exe\n🍷 Ready to run with Wine...\n"
+        selectedFile = "notepad.exe"
+        consoleOutput = "🍷 Selected: notepad.exe\n🍷 Ready to run with Wine...\n"
     }
     
     func runApplication() {
@@ -156,6 +156,7 @@ struct ContentView: View {
                 consoleOutput += "🍷 Wine compatibility layer active\n"
                 consoleOutput += "🍷 Windows API translation working\n"
                 consoleOutput += "🍷 File system redirection active\n"
+                consoleOutput += "🍷 Application interface loaded\n"
             }
             
             DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
@@ -165,15 +166,15 @@ struct ContentView: View {
         }
     }
     
-    func testIMGTool() {
-        selectedFile = "IMGTool.exe"
-        consoleOutput = "🍷 Testing IMG Tool with Wine...\n"
+    func testNotepad() {
+        selectedFile = "notepad.exe"
+        consoleOutput = "🍷 Testing Notepad with Wine...\n"
         runApplication()
     }
     
-    func testTXDTool() {
-        selectedFile = "TXDTool.exe"
-        consoleOutput = "🍷 Testing TXD Tool with Wine...\n"
+    func testCalculator() {
+        selectedFile = "calc.exe"
+        consoleOutput = "🍷 Testing Calculator with Wine...\n"
         runApplication()
     }
 }

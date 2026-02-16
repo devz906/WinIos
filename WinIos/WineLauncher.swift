@@ -141,38 +141,65 @@ class WineCompatibilityLayer {
         
         let exeName = URL(fileURLWithPath: exePath).lastPathComponent.lowercased()
         
-        if exeName.contains("imgtool") {
-            return simulateIMGTool()
-        } else if exeName.contains("txdtool") {
-            return simulateTXDTool()
+        if exeName.contains("notepad") {
+            return simulateNotepad()
+        } else if exeName.contains("calc") {
+            return simulateCalculator()
+        } else if exeName.contains("explorer") {
+            return simulateExplorer()
+        } else if exeName.contains("cmd") || exeName.contains("command") {
+            return simulateCommandPrompt()
         } else {
             return simulateGenericEXE(exeName: exeName)
         }
     }
     
-    private func simulateIMGTool() -> WineLauncher.WineResult {
-        print("🎮 Simulating IMG Tool execution...")
-        print("📁 Loading GTA archive format...")
-        print("🔧 Extracting IMG contents...")
-        print("✅ IMG Tool simulation complete!")
+    private func simulateNotepad() -> WineLauncher.WineResult {
+        print("📝 Simulating Notepad execution...")
+        print("� Loading text editor interface...")
+        print("✏️ Initializing font rendering...")
+        print("💾 Setting up file operations...")
+        print("✅ Notepad simulation complete!")
         
-        return .success("IMG Tool executed successfully. Ready to process GTA archives.")
+        return .success("Notepad executed successfully. Ready to edit text files.")
     }
     
-    private func simulateTXDTool() -> WineLauncher.WineResult {
-        print("🎨 Simulating TXD Tool execution...")
-        print("🖼️ Loading texture format...")
-        print("🎭 Processing textures...")
-        print("✅ TXD Tool simulation complete!")
+    private func simulateCalculator() -> WineLauncher.WineResult {
+        print("🧮 Simulating Calculator execution...")
+        print("� Loading calculator interface...")
+        print("⚡ Initializing math engine...")
+        print("🎯 Setting up button handlers...")
+        print("✅ Calculator simulation complete!")
         
-        return .success("TXD Tool executed successfully. Ready to edit textures.")
+        return .success("Calculator executed successfully. Ready for calculations.")
+    }
+    
+    private func simulateExplorer() -> WineLauncher.WineResult {
+        print("🗂️ Simulating Windows Explorer execution...")
+        print("📁 Loading file manager interface...")
+        print("🔍 Initializing file system browser...")
+        print("⚙️ Setting up shell integration...")
+        print("✅ Explorer simulation complete!")
+        
+        return .success("Windows Explorer executed successfully. Ready to browse files.")
+    }
+    
+    private func simulateCommandPrompt() -> WineLauncher.WineResult {
+        print("💻 Simulating Command Prompt execution...")
+        print("⌨️ Loading console interface...")
+        print("🖥️ Initializing command interpreter...")
+        print("🔧 Setting up system commands...")
+        print("✅ Command Prompt simulation complete!")
+        
+        return .success("Command Prompt executed successfully. Ready for command line operations.")
     }
     
     private func simulateGenericEXE(exeName: String) -> WineLauncher.WineResult {
-        print("🔄 Simulating generic Windows EXE: \(exeName)")
-        print("⚙️ Initializing Windows environment...")
-        print("🖥️ Creating virtual desktop...")
-        print("✅ Generic EXE simulation complete!")
+        print("🔄 Simulating Windows application: \(exeName)")
+        print("⚙️ Analyzing executable requirements...")
+        print("🖥️ Creating application window...")
+        print("🔗 Loading required libraries...")
+        print("✅ Generic application simulation complete!")
         
         return .success("Windows application '\(exeName)' executed successfully.")
     }

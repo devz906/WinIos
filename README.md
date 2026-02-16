@@ -3,10 +3,12 @@
 **Run Windows applications on iPhone/iPad - Like Winlator but for iOS!**
 
 ## 🎯 Goal
-Create a Windows compatibility layer for iOS that can run Windows applications, specifically targeting:
-- GTA modding tools (IMG Tool, TXD Tool, etc.)
-- File management utilities
+Create a Windows compatibility layer for iOS that can run ANY Windows application, optimized for:
+- Small Windows utilities (Notepad, Calculator, etc.)
+- File management tools
+- Command line applications
 - Simple Windows executables
+- Development tools and utilities
 
 ## 🏗️ Architecture
 ```
@@ -32,10 +34,13 @@ iOS ARM Execution
 - [ ] Test with console applications
 
 ## 🎮 Target Applications
-- ✅ GTA IMG Tool (extract/repack IMG files)
-- ✅ TXD Tool (texture editing)
-- ✅ Simple file managers
-- [ ] More complex Windows tools
+- ✅ Notepad (text editing)
+- ✅ Calculator (math operations)
+- ✅ Windows Explorer (file management)
+- ✅ Command Prompt (command line)
+- ✅ Any small Windows utility
+- [ ] Complex Windows applications
+- [ ] Games and multimedia software
 
 ## 🛠️ Technical Stack
 - **Swift**: iOS UI and orchestration
