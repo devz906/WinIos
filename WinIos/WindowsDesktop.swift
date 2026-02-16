@@ -19,38 +19,48 @@ struct WindowsDesktopView: View {
             
             // Desktop icons
             if showDesktop {
-                VStack {
-                    HStack {
+                VStack(spacing: 20) {
+                    HStack(spacing: 15) {
                         DesktopIcon(icon: "computer", title: "My Computer") {
                             openExplorer()
                         }
-                        Spacer()
                         DesktopIcon(icon: "doc.text", title: "Documents") {
                             openDocuments()
                         }
-                        Spacer()
                         DesktopIcon(icon: "gear", title: "Settings") {
                             // Open settings
                         }
                     }
-                    .padding()
+                    .padding(.top, 40)
                     
                     Spacer()
                     
-                    HStack {
+                    HStack(spacing: 15) {
                         DesktopIcon(icon: "play.rectangle", title: "Notepad") {
                             openNotepad()
                         }
-                        Spacer()
                         DesktopIcon(icon: "plusminus.rectangle", title: "Calculator") {
                             openCalculator()
                         }
-                        Spacer()
                         DesktopIcon(icon: "terminal", title: "Command Prompt") {
                             openCMD()
                         }
                     }
-                    .padding()
+                    
+                    Spacer()
+                    
+                    HStack(spacing: 15) {
+                        DesktopIcon(icon: "folder", title: "User EXE") {
+                            openUserEXE()
+                        }
+                        DesktopIcon(icon: "gamecontroller", title: "Games") {
+                            openGames()
+                        }
+                        DesktopIcon(icon: "network", title: "Network") {
+                            openNetwork()
+                        }
+                    }
+                    .padding(.bottom, 80)
                 }
             }
             
@@ -118,8 +128,8 @@ struct WindowsDesktopView: View {
             name: "Notepad",
             icon: "doc.text",
             content: AnyView(NotepadView()),
-            position: CGPoint(x: 100, y: 100),
-            size: CGSize(width: 600, height: 400)
+            position: CGPoint(x: 50, y: 100),
+            size: CGSize(width: 350, height: 250)
         )
         runningApps.append(notepadApp)
     }
@@ -130,8 +140,8 @@ struct WindowsDesktopView: View {
             name: "Calculator",
             icon: "plusminus.rectangle",
             content: AnyView(CalculatorView()),
-            position: CGPoint(x: 200, y: 150),
-            size: CGSize(width: 320, height: 480)
+            position: CGPoint(x: 120, y: 150),
+            size: CGSize(width: 280, height: 400)
         )
         runningApps.append(calcApp)
     }
@@ -142,8 +152,8 @@ struct WindowsDesktopView: View {
             name: "Command Prompt",
             icon: "terminal",
             content: AnyView(CommandPromptView()),
-            position: CGPoint(x: 150, y: 200),
-            size: CGSize(width: 700, height: 400)
+            position: CGPoint(x: 80, y: 200),
+            size: CGSize(width: 380, height: 300)
         )
         runningApps.append(cmdApp)
     }
@@ -154,8 +164,8 @@ struct WindowsDesktopView: View {
             name: "Windows Explorer",
             icon: "computer",
             content: AnyView(ExplorerView()),
-            position: CGPoint(x: 50, y: 50),
-            size: CGSize(width: 800, height: 600)
+            position: CGPoint(x: 30, y: 50),
+            size: CGSize(width: 400, height: 350)
         )
         runningApps.append(explorerApp)
     }
@@ -166,10 +176,46 @@ struct WindowsDesktopView: View {
             name: "Documents",
             icon: "doc.text",
             content: AnyView(ExplorerView(initialPath: "C:\\Users\\iphoneuser\\Documents")),
-            position: CGPoint(x: 100, y: 100),
-            size: CGSize(width: 800, height: 600)
+            position: CGPoint(x: 50, y: 100),
+            size: CGSize(width: 400, height: 350)
         )
         runningApps.append(explorerApp)
+    }
+    
+    private func openUserEXE() {
+        let exeApp = WindowsApp(
+            id: UUID(),
+            name: "User EXE Loader",
+            icon: "folder",
+            content: AnyView(UserEXEView()),
+            position: CGPoint(x: 100, y: 120),
+            size: CGSize(width: 380, height: 280)
+        )
+        runningApps.append(exeApp)
+    }
+    
+    private func openGames() {
+        let gamesApp = WindowsApp(
+            id: UUID(),
+            name: "Games",
+            icon: "gamecontroller",
+            content: AnyView(GamesView()),
+            position: CGPoint(x: 150, y: 180),
+            size: CGSize(width: 350, height: 300)
+        )
+        runningApps.append(gamesApp)
+    }
+    
+    private func openNetwork() {
+        let networkApp = WindowsApp(
+            id: UUID(),
+            name: "Network",
+            icon: "network",
+            content: AnyView(NetworkView()),
+            position: CGPoint(x: 200, y: 140),
+            size: CGSize(width: 320, height: 250)
+        )
+        runningApps.append(networkApp)
     }
 }
 
@@ -183,17 +229,19 @@ struct DesktopIcon: View {
         Button(action: action) {
             VStack(spacing: 4) {
                 Image(systemName: icon)
-                    .font(.title)
+                    .font(.title2)
                     .foregroundColor(.white)
-                    .frame(width: 48, height: 48)
+                    .frame(width: 40, height: 40)
                     .background(Color.black.opacity(0.3))
-                    .cornerRadius(8)
+                    .cornerRadius(6)
                 
                 Text(title)
-                    .font(.caption)
+                    .font(.caption2)
                     .foregroundColor(.white)
                     .shadow(color: .black, radius: 1)
+                    .multilineTextAlignment(.center)
             }
+            .frame(maxWidth: 50)
         }
         .buttonStyle(PlainButtonStyle())
     }
@@ -206,12 +254,17 @@ struct AppWindow: View {
     @State private var position: CGPoint
     @State private var size: CGSize
     @State private var isMaximized = false
+    @State private var screenWidth: CGFloat
+    @State private var screenHeight: CGFloat
     
     init(app: WindowsApp, onClose: @escaping () -> Void) {
         self.app = app
         self.onClose = onClose
         self._position = State(initialValue: app.position)
         self._size = State(initialValue: app.size)
+        let screen = UIScreen.main.bounds
+        self._screenWidth = State(initialValue: screen.width)
+        self._screenHeight = State(initialValue: screen.height)
     }
     
     var body: some View {
@@ -249,11 +302,12 @@ struct AppWindow: View {
                 .frame(maxWidth: .infinity, maxHeight: .infinity)
                 .background(Color.white)
         }
-        .frame(width: size.width, height: size.height)
+        .frame(width: isMaximized ? screenWidth - 20 : min(size.width, screenWidth - 40), 
+               height: isMaximized ? screenHeight - 120 : min(size.height, screenHeight - 160))
         .background(Color.gray.opacity(0.9))
         .cornerRadius(8)
         .shadow(radius: 10)
-        .position(position)
+        .position(isMaximized ? CGPoint(x: screenWidth/2, y: screenHeight/2 - 40) : position)
         .gesture(
             DragGesture()
                 .onChanged { value in
@@ -649,5 +703,226 @@ func generateFiles(for path: String) -> [FileItem] {
             FileItem(name: "File1.txt", isDirectory: false, size: "1024", modifiedDate: "2024-01-15", path: "\(path)\\File1.txt", icon: "doc.text"),
             FileItem(name: "File2.txt", isDirectory: false, size: "2048", modifiedDate: "2024-01-14", path: "\(path)\\File2.txt", icon: "doc.text"),
         ]
+    }
+}
+
+// User EXE Loader view
+struct UserEXEView: View {
+    @State private var selectedFile: String = ""
+    @State private var output = "User EXE Loader\n\nSelect a Windows executable to run:\n"
+    
+    var body: some View {
+        VStack(spacing: 0) {
+            // Header
+            HStack {
+                Image(systemName: "folder")
+                    .foregroundColor(.primary)
+                
+                Text("User EXE Loader")
+                    .font(.headline)
+                    .foregroundColor(.primary)
+                
+                Spacer()
+            }
+            .padding(.horizontal, 8)
+            .padding(.vertical, 4)
+            .background(Color.gray.opacity(0.3))
+            
+            // Content
+            VStack(spacing: 16) {
+                Text("Load Your Windows EXE")
+                    .font(.title2)
+                    .fontWeight(.bold)
+                
+                Text("Select any Windows executable (.exe) file to run with Wine")
+                    .font(.body)
+                    .multilineTextAlignment(.center)
+                    .padding(.horizontal)
+                
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Supported EXE types:")
+                        .font(.headline)
+                    
+                    Text("• GTA modding tools (IMG Tool, TXD Tool)")
+                    Text("• File managers and utilities")
+                    Text("• Simple Windows applications")
+                    Text("• Development tools")
+                }
+                .font(.caption)
+                .padding()
+                .background(Color.gray.opacity(0.1))
+                .cornerRadius(8)
+                
+                Button("Browse for EXE File") {
+                    output += "\n📁 File browser opened\n"
+                    output += "🔍 Select your Windows executable\n"
+                }
+                .padding()
+                .background(Color.blue)
+                .foregroundColor(.white)
+                .cornerRadius(8)
+                
+                Spacer()
+                
+                ScrollView {
+                    Text(output)
+                        .font(.system(.caption, design: .monospaced))
+                        .frame(maxWidth: .infinity, alignment: .leading)
+                        .padding(8)
+                        .background(Color.black.opacity(0.8))
+                        .foregroundColor(.green)
+                        .cornerRadius(8)
+                }
+                .frame(height: 120)
+            }
+            .padding()
+        }
+    }
+}
+
+// Games view
+struct GamesView: View {
+    @State private var selectedGame = ""
+    
+    var body: some View {
+        VStack(spacing: 0) {
+            // Header
+            HStack {
+                Image(systemName: "gamecontroller")
+                    .foregroundColor(.primary)
+                
+                Text("Games")
+                    .font(.headline)
+                    .foregroundColor(.primary)
+                
+                Spacer()
+            }
+            .padding(.horizontal, 8)
+            .padding(.vertical, 4)
+            .background(Color.gray.opacity(0.3))
+            
+            // Content
+            VStack(spacing: 16) {
+                Text("Windows Games")
+                    .font(.title2)
+                    .fontWeight(.bold)
+                
+                LazyVGrid(columns: [
+                    GridItem(.flexible()),
+                    GridItem(.flexible())
+                ], spacing: 16) {
+                    GameCard(title: "Solitaire", icon: "suit.spade.fill", color: .red)
+                    GameCard(title: "Minesweeper", icon: "bomb.fill", color: .orange)
+                    GameCard(title: "Hearts", icon: "heart.fill", color: .pink)
+                    GameCard(title: "FreeCell", icon: "rectangle.stack.fill", color: .blue)
+                }
+                
+                Spacer()
+            }
+            .padding()
+        }
+    }
+}
+
+struct GameCard: View {
+    let title: String
+    let icon: String
+    let color: Color
+    
+    var body: some View {
+        VStack(spacing: 8) {
+            Image(systemName: icon)
+                .font(.largeTitle)
+                .foregroundColor(color)
+            
+            Text(title)
+                .font(.caption)
+                .fontWeight(.medium)
+        }
+        .frame(maxWidth: .infinity)
+        .padding()
+        .background(Color.gray.opacity(0.1))
+        .cornerRadius(8)
+        .onTapGesture {
+            // Launch game
+        }
+    }
+}
+
+// Network view
+struct NetworkView: View {
+    @State private var networkStatus = "Connected"
+    @State private var ipAddress = "192.168.1.100"
+    
+    var body: some View {
+        VStack(spacing: 0) {
+            // Header
+            HStack {
+                Image(systemName: "network")
+                    .foregroundColor(.primary)
+                
+                Text("Network")
+                    .font(.headline)
+                    .foregroundColor(.primary)
+                
+                Spacer()
+            }
+            .padding(.horizontal, 8)
+            .padding(.vertical, 4)
+            .background(Color.gray.opacity(0.3))
+            
+            // Content
+            VStack(spacing: 16) {
+                HStack {
+                    Image(systemName: networkStatus == "Connected" ? "wifi" : "wifi.slash")
+                        .foregroundColor(networkStatus == "Connected" ? .green : .red)
+                    
+                    VStack(alignment: .leading) {
+                        Text("Network Status")
+                            .font(.headline)
+                        Text(networkStatus)
+                            .font(.caption)
+                            .foregroundColor(networkStatus == "Connected" ? .green : .red)
+                    }
+                    
+                    Spacer()
+                }
+                .padding()
+                .background(Color.gray.opacity(0.1))
+                .cornerRadius(8)
+                
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("Network Information")
+                        .font(.headline)
+                    
+                    HStack {
+                        Text("IP Address:")
+                        Spacer()
+                        Text(ipAddress)
+                            .font(.system(.body, design: .monospaced))
+                    }
+                    
+                    HStack {
+                        Text("Connection:")
+                        Spacer()
+                        Text("Wi-Fi")
+                    }
+                    
+                    HStack {
+                        Text("Signal Strength:")
+                        Spacer()
+                        Text("Excellent")
+                            .foregroundColor(.green)
+                    }
+                }
+                .font(.caption)
+                .padding()
+                .background(Color.gray.opacity(0.1))
+                .cornerRadius(8)
+                
+                Spacer()
+            }
+            .padding()
+        }
     }
 }
