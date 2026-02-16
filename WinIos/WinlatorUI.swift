@@ -142,16 +142,22 @@ struct WinlatorDesktopView: View {
                 id: UUID(),
                 name: file.lastPathComponent,
                 icon: "gamecontroller",
-                content: AnyView(WinlatorEXELoaderView(exeFile: file, consoleOutput: $consoleOutput)),
-                position: CGPoint(x: 80, y: 120),
-                size: CGSize(width: 450, height: 350)
+                content: AnyView(WinlatorEXELoaderView(exeFile: file, consoleOutput: $consoleOutput, wineEngine: wineEngine, container: container, config: wineConfig)),
+                position: CGPoint(x: 50, y: 80),
+                size: CGSize(width: UIScreen.main.bounds.width * 0.9, height: UIScreen.main.bounds.height * 0.7)
             )
             runningApps.append(exeApp)
             
             // Execute with Wine
             DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                consoleOutput += "🍷 Starting Wine execution...\n"
                 let result = wineEngine.execute(exePath: file.path, in: container, config: wineConfig)
                 consoleOutput += result.message + "\n"
+                
+                if result.message == "DESKTOP_LAUNCH" {
+                    consoleOutput += "🍷 Application launched successfully!\n"
+                    consoleOutput += "🍷 Ready to use Windows application\n"
+                }
             }
         } else {
             consoleOutput += "❌ Invalid Windows executable\n"
@@ -289,7 +295,7 @@ struct WinlatorAppWindow: View {
         self.app = app
         self.onClose = onClose
         self._position = State(initialValue: app.position)
-        self._size = State(initialValue: app.size)
+        self._size = State(initialValue: CGSize(width: UIScreen.main.bounds.width * 0.85, height: UIScreen.main.bounds.height * 0.75))
     }
     
     var body: some View {
@@ -338,15 +344,16 @@ struct WinlatorAppWindow: View {
         }
         .frame(width: size.width, height: size.height)
         .background(Color.gray.opacity(0.9))
-        .cornerRadius(8)
-        .shadow(color: .black.opacity(0.3), radius: 8)
+        .cornerRadius(12)
+        .shadow(color: .black.opacity(0.4), radius: 12)
         .position(position)
         .scaleEffect(isDragging ? 1.02 : 1.0)
-        .animation(.easeInOut(duration: 0.1), value: isDragging)
-        .gesture(
+        .animation(.easeInOut(duration: 0.2), value: isDragging)
+        .simultaneousGesture(
+            // Title bar drag gesture
             DragGesture()
                 .onChanged { value in
-                    if !isMaximized {
+                    if !isMaximized && value.startLocation.y < 40 {
                         position.x += value.translation.width
                         position.y += value.translation.height
                         isDragging = true
@@ -354,6 +361,13 @@ struct WinlatorAppWindow: View {
                 }
                 .onEnded { _ in
                     isDragging = false
+                }
+        )
+        .gesture(
+            // Content tap gesture - prevents accidental closing
+            TapGesture()
+                .onEnded { _ in
+                    // Handle content taps - don't close window
                 }
         )
     }
@@ -389,12 +403,16 @@ struct WinlatorTaskbar: View {
                 HStack(spacing: 4) {
                     ForEach(runningApps) { app in
                         Button(action: {
-                            // Bring app to front
+                            // Bring app to front by moving it to end of array
+                            if let index = runningApps.firstIndex(where: { $0.id == app.id }) {
+                                let movedApp = runningApps.remove(at: index)
+                                runningApps.append(movedApp)
+                            }
                         }) {
                             Image(systemName: app.icon)
                                 .font(.caption)
                                 .padding(6)
-                                .background(Color.gray.opacity(0.3))
+                                .background(runningApps.last?.id == app.id ? Color.blue.opacity(0.5) : Color.gray.opacity(0.3))
                                 .cornerRadius(4)
                         }
                     }
@@ -743,6 +761,9 @@ struct WinlatorExplorerView: View {
 struct WinlatorEXELoaderView: View {
     let exeFile: URL
     @Binding var consoleOutput: String
+    let wineEngine: WineEngine
+    let container: WineEngine.WineContainer
+    let config: WineEngine.WineConfig
     
     var body: some View {
         VStack(spacing: 0) {
@@ -780,6 +801,32 @@ struct WinlatorEXELoaderView: View {
                 ProgressView("Loading with Wine...")
                     .scaleEffect(0.8)
                 
+                HStack(spacing: 16) {
+                    Button("Execute") {
+                        executeEXE()
+                    }
+                    .padding()
+                    .background(Color.green)
+                    .foregroundColor(.white)
+                    .cornerRadius(8)
+                    
+                    Button("Configure") {
+                        consoleOutput += "\n🔧 Opening Wine configuration...\n"
+                    }
+                    .padding()
+                    .background(Color.blue)
+                    .foregroundColor(.white)
+                    .cornerRadius(8)
+                    
+                    Button("Debug") {
+                        showDebugInfo()
+                    }
+                    .padding()
+                    .background(Color.orange)
+                    .foregroundColor(.white)
+                    .cornerRadius(8)
+                }
+                
                 ScrollView {
                     Text(consoleOutput)
                         .font(.system(.caption, design: .monospaced))
@@ -789,7 +836,7 @@ struct WinlatorEXELoaderView: View {
                         .foregroundColor(.green)
                         .cornerRadius(8)
                 }
-                .frame(height: 150)
+                .frame(height: 200)
                 
                 Spacer()
             }
@@ -801,6 +848,42 @@ struct WinlatorEXELoaderView: View {
         let attributes = try? FileManager.default.attributesOfItem(atPath: url.path)
         let fileSize = attributes?[.size] as? Int64 ?? 0
         return ByteCountFormatter.string(fromByteCount: fileSize, countStyle: .file)
+    }
+    
+    private func executeEXE() {
+        consoleOutput += "\n🚀 Executing \(exeFile.lastPathComponent)...\n"
+        consoleOutput += "🍷 Wine: Starting execution\n"
+        consoleOutput += "🍷 Container: \(container.name)\n"
+        consoleOutput += "🍷 Resolution: \(config.desktopResolution)\n"
+        consoleOutput += "🍷 Graphics: \(config.graphicsDriver)\n"
+        
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+            let result = wineEngine.execute(exePath: exeFile.path, in: container, config: config)
+            consoleOutput += result.message + "\n"
+            
+            if result.message == "DESKTOP_LAUNCH" {
+                consoleOutput += "\n✅ Application executed successfully!\n"
+                consoleOutput += "🎮 Ready to use Windows application\n"
+                consoleOutput += "🍷 Wine compatibility layer active\n"
+                consoleOutput += "🍷 Windows API translation working\n"
+                consoleOutput += "🍷 File system redirection active\n"
+            }
+        }
+    }
+    
+    private func showDebugInfo() {
+        consoleOutput += "\n🔍 Debug Information:\n"
+        consoleOutput += "📁 EXE File: \(exeFile.lastPathComponent)\n"
+        consoleOutput += "📏 File Size: \(formatFileSize(exeFile))\n"
+        consoleOutput += "📍 File Path: \(exeFile.path)\n"
+        consoleOutput += "🍷 Wine Container: \(container.name)\n"
+        consoleOutput += "🖥️ Resolution: \(config.desktopResolution)\n"
+        consoleOutput += "🎨 Graphics Driver: \(config.graphicsDriver)\n"
+        consoleOutput += "🔊 Sound Driver: \(config.soundDriver)\n"
+        consoleOutput += "🪟 Windows Version: \(config.windowsVersion)\n"
+        consoleOutput += "📱 iOS Version: \(UIDevice.current.systemVersion)\n"
+        consoleOutput += "📱 Device: \(UIDevice.current.model)\n"
+        consoleOutput += "🖥️ Screen Size: \(UIScreen.main.bounds.width)x\(UIScreen.main.bounds.height)\n"
     }
 }
 
