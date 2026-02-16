@@ -299,77 +299,75 @@ struct WinlatorAppWindow: View {
     }
     
     var body: some View {
-        VStack(spacing: 0) {
-            // Winlator-style title bar
-            HStack {
-                Image(systemName: app.icon)
-                    .foregroundColor(.white)
-                    .font(.caption)
-                
-                Text(app.name)
-                    .font(.caption)
-                    .foregroundColor(.white)
-                    .lineLimit(1)
-                
-                Spacer()
-                
-                HStack(spacing: 12) {
-                    Button(action: { isMaximized.toggle() }) {
-                        Image(systemName: isMaximized ? "minus.rectangle" : "plus.rectangle")
-                            .font(.caption2)
-                            .foregroundColor(.white)
-                    }
+        ZStack {
+            // Window background
+            RoundedRectangle(cornerRadius: 12)
+                .fill(Color.gray.opacity(0.9))
+                .shadow(color: .black.opacity(0.4), radius: 12)
+            
+            VStack(spacing: 0) {
+                // Winlator-style title bar
+                HStack {
+                    Image(systemName: app.icon)
+                        .foregroundColor(.white)
+                        .font(.caption)
                     
-                    Button(action: onClose) {
-                        Image(systemName: "xmark")
-                            .font(.caption2)
-                            .foregroundColor(.white)
+                    Text(app.name)
+                        .font(.caption)
+                        .foregroundColor(.white)
+                        .lineLimit(1)
+                    
+                    Spacer()
+                    
+                    HStack(spacing: 12) {
+                        Button(action: { isMaximized.toggle() }) {
+                            Image(systemName: isMaximized ? "minus.rectangle" : "plus.rectangle")
+                                .font(.caption2)
+                                .foregroundColor(.white)
+                        }
+                        
+                        Button(action: onClose) {
+                            Image(systemName: "xmark")
+                                .font(.caption2)
+                                .foregroundColor(.white)
+                        }
                     }
                 }
-            }
-            .padding(.horizontal, 8)
-            .padding(.vertical, 4)
-            .background(
-                LinearGradient(
-                    colors: [Color.blue.opacity(0.8), Color.purple.opacity(0.6)],
-                    startPoint: .leading,
-                    endPoint: .trailing
+                .padding(.horizontal, 8)
+                .padding(.vertical, 4)
+                .background(
+                    LinearGradient(
+                        colors: [Color.blue.opacity(0.8), Color.purple.opacity(0.6)],
+                        startPoint: .leading,
+                        endPoint: .trailing
+                    )
                 )
-            )
-            
-            // App content
-            app.content
-                .frame(maxWidth: .infinity, maxHeight: .infinity)
-                .background(Color.white)
+                .gesture(
+                    // Title bar drag gesture - only on title bar
+                    DragGesture()
+                        .onChanged { value in
+                            if !isMaximized {
+                                position.x += value.translation.width
+                                position.y += value.translation.height
+                                isDragging = true
+                            }
+                        }
+                        .onEnded { _ in
+                            isDragging = false
+                        }
+                )
+                
+                // App content area
+                app.content
+                    .frame(maxWidth: .infinity, maxHeight: .infinity)
+                    .background(Color.white)
+                    .clipped()
+            }
         }
         .frame(width: size.width, height: size.height)
-        .background(Color.gray.opacity(0.9))
-        .cornerRadius(12)
-        .shadow(color: .black.opacity(0.4), radius: 12)
         .position(position)
         .scaleEffect(isDragging ? 1.02 : 1.0)
         .animation(.easeInOut(duration: 0.2), value: isDragging)
-        .simultaneousGesture(
-            // Title bar drag gesture
-            DragGesture()
-                .onChanged { value in
-                    if !isMaximized && value.startLocation.y < 40 {
-                        position.x += value.translation.width
-                        position.y += value.translation.height
-                        isDragging = true
-                    }
-                }
-                .onEnded { _ in
-                    isDragging = false
-                }
-        )
-        .gesture(
-            // Content tap gesture - prevents accidental closing
-            TapGesture()
-                .onEnded { _ in
-                    // Handle content taps - don't close window
-                }
-        )
     }
 }
 
@@ -837,6 +835,12 @@ struct WinlatorEXELoaderView: View {
                         .cornerRadius(8)
                 }
                 .frame(height: 200)
+                .gesture(
+                    // Prevent gesture conflicts in console area
+                    DragGesture(minimumDistance: 0)
+                        .onChanged { _ in }
+                        .onEnded { _ in }
+                )
                 
                 Spacer()
             }
