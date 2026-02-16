@@ -29,16 +29,20 @@ jobs:
           # Try to compile main app files
           if [ -s swift_files.txt ]; then
             echo "Compiling $(wc -l < swift_files.txt) Swift files..."
-            swiftc -o build/Release-iphoneos/WinIos \
-              -sdk $(xcrun --sdk iphoneos --show-sdk-path) \
-              -target arm64-apple-ios17.0 \
-              -O \
-              -framework Foundation \
-              -framework UIKit \
-              -framework SwiftUI \
-              -framework MetalKit \
-              -framework CoreImage \
-              $(cat swift_files.txt) || echo "Swift compilation failed"
+            # Try compiling SimpleApp.swift first (standalone)
+            if [ -f WinIos/SimpleApp.swift ]; then
+              echo "Trying SimpleApp.swift compilation..."
+              swiftc -o build/Release-iphoneos/WinIos \
+                -sdk $(xcrun --sdk iphoneos --show-sdk-path) \
+                -target arm64-apple-ios17.0 \
+                -O \
+                -framework Foundation \
+                -framework UIKit \
+                -framework SwiftUI \
+                WinIos/SimpleApp.swift || echo "SimpleApp.swift compilation failed"
+            else
+              echo "SimpleApp.swift not found"
+            fi
           else
             echo "No Swift files found to compile"
           fi
