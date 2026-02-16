@@ -258,8 +258,8 @@ struct AppWindow: View {
             DragGesture()
                 .onChanged { value in
                     if !isMaximized {
-                        position.x += value.translation.x
-                        position.y += value.translation.y
+                        position.x += value.translation.width
+                        position.y += value.translation.height
                     }
                 }
         )
@@ -523,11 +523,11 @@ struct ExplorerView: View {
                     .font(.headline)
                     .padding()
                 
-                SidebarItem(icon: "desktopcomputer", title: "Desktop", path: "C:\\Users\\iphoneuser\\Desktop")
-                SidebarItem(icon: "doc.text", title: "Documents", path: "C:\\Users\\iphoneuser\\Documents")
-                SidebarItem(icon: "photo", title: "Pictures", path: "C:\\Users\\iphoneuser\\Pictures")
-                SidebarItem(icon: "music.note", title: "Music", path: "C:\\Users\\iphoneuser\\Music")
-                SidebarItem(icon: "tv", title: "Videos", path: "C:\\Users\\iphoneuser\\Videos")
+                SidebarItem(icon: "desktopcomputer", title: "Desktop", path: "C:\\Users\\iphoneuser\\Desktop", selectedPath: $selectedPath)
+                SidebarItem(icon: "doc.text", title: "Documents", path: "C:\\Users\\iphoneuser\\Documents", selectedPath: $selectedPath)
+                SidebarItem(icon: "photo", title: "Pictures", path: "C:\\Users\\iphoneuser\\Pictures", selectedPath: $selectedPath)
+                SidebarItem(icon: "music.note", title: "Music", path: "C:\\Users\\iphoneuser\\Music", selectedPath: $selectedPath)
+                SidebarItem(icon: "tv", title: "Videos", path: "C:\\Users\\iphoneuser\\Videos", selectedPath: $selectedPath)
                 
                 Spacer()
             }
@@ -596,11 +596,11 @@ struct SidebarItem: View {
     let path: String
     @Binding var selectedPath: String
     
-    init(icon: String, title: String, path: String) {
+    init(icon: String, title: String, path: String, selectedPath: Binding<String>) {
         self.icon = icon
         self.title = title
         self.path = path
-        self._selectedPath = State(initialValue: "")
+        self._selectedPath = selectedPath
     }
     
     var body: some View {
