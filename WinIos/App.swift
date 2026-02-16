@@ -251,7 +251,7 @@ struct ContentView: View {
     @State private var consoleOutput = "🍷 WinIos - Windows Emulator for iOS\n🍷 Ready to run Windows applications...\n"
     @State private var selectedFile: URL?
     @State private var showingFilePicker = false
-    @State private var wineEngine = WineEngine()
+    private let wineEngine = WineEngine()
     @State private var peInfo = ""
     @State private var currentContainer: WineEngine.WineContainer?
     @State private var wineConfig = WineEngine.WineConfig()
