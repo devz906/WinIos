@@ -452,7 +452,8 @@ class iOSWinlatorEngine {
             
             if executionResult.success {
                 details.append("✅ Windows code executed successfully")
-                details.append("⚡ Performance: \(executionResult.performance)")
+                details.append("⚡ Instructions Executed: \(executionResult.instructionsExecuted)")
+                details.append("📍 Final EIP: 0x\(String(executionResult.finalEIP, radix: 16))")
                 
                 // Step 4: Translate graphics
                 let graphicsResult = graphicsTranslator.translateDirectXToMetal("Direct3D11")
@@ -467,7 +468,7 @@ class iOSWinlatorEngine {
             } else {
                 return WinlatorExecutionResult(
                     success: false,
-                    message: executionResult.message,
+                    message: "Windows application execution failed",
                     details: details
                 )
             }
