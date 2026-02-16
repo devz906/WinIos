@@ -807,10 +807,10 @@ struct WinlatorEXELoaderView: View {
 // Winlator Games view
 struct WinlatorGamesView: View {
     let games = [
-        ("Solitaire", "suit.spade.fill", .red),
-        ("Minesweeper", "bomb.fill", .orange),
-        ("Hearts", "heart.fill", .pink),
-        ("FreeCell", "rectangle.stack.fill", .blue)
+        ("Solitaire", "suit.spade.fill", Color.red),
+        ("Minesweeper", "bomb.fill", Color.orange),
+        ("Hearts", "heart.fill", Color.pink),
+        ("FreeCell", "rectangle.stack.fill", Color.blue)
     ]
     
     var body: some View {
@@ -835,7 +835,8 @@ struct WinlatorGamesView: View {
                 GridItem(.flexible()),
                 GridItem(.flexible())
             ], spacing: 16) {
-                ForEach(games, id: \.0) { game in
+                ForEach(0..<games.count, id: \.self) { index in
+                    let game = games[index]
                     VStack(spacing: 8) {
                         Image(systemName: game.1)
                             .font(.largeTitle)

@@ -59,7 +59,7 @@ class WineEngine {
         
         private func createRegistry() {
             let registryPath = path.appendingPathComponent("system.reg")
-            var registryContent = """
+            let registryContent = """
             WINE REGISTRY Version 2
             ;; All keys are relative to \\User\\S-1-5-21-0-0-0-1000
             
@@ -84,7 +84,7 @@ class WineEngine {
         
         private func createDLLOverrides() {
             let userRegPath = path.appendingPathComponent("user.reg")
-            var dllContent = """
+            let dllContent = """
             WINE REGISTRY Version 2
             ;; All keys are relative to \\User\\S-1-5-21-0-0-0-1000
             
