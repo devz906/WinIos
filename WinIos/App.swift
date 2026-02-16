@@ -251,8 +251,11 @@ struct ContentView: View {
     @State private var consoleOutput = "🍷 WinIos - Windows Emulator for iOS\n🍷 Ready to run Windows applications...\n"
     @State private var selectedFile: URL?
     @State private var showingFilePicker = false
-    @State private var wineLauncher = WineLauncher()
+    @State private var wineEngine = WineEngine()
     @State private var peInfo = ""
+    @State private var currentContainer: WineEngine.WineContainer?
+    @State private var wineConfig = WineEngine.WineConfig()
+    @State private var showingSettings = false
     
     var body: some View {
         NavigationView {
@@ -272,6 +275,12 @@ struct ContentView: View {
                         Text("Powered by Wine")
                             .font(.caption)
                             .foregroundColor(.purple)
+                        
+                        Button(action: { showingSettings = true }) {
+                            Image(systemName: "gearshape.fill")
+                                .font(.title2)
+                                .foregroundColor(.gray)
+                        }
                     }
                     .padding()
                     
@@ -320,6 +329,16 @@ struct ContentView: View {
                                 .background(Color.black.opacity(0.6))
                                 .foregroundColor(.green)
                                 .cornerRadius(6)
+                        }
+                        
+                        // Container info
+                        if let container = currentContainer {
+                            Text("Container: \(container.name)")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
+                            Text("Resolution: \(wineConfig.desktopResolution)")
+                                .font(.caption)
+                                .foregroundColor(.secondary)
                         }
                     }
                     
@@ -387,32 +406,36 @@ struct ContentView: View {
             .sheet(isPresented: $showingFilePicker) {
                 DocumentPicker(selectedFile: $selectedFile, peInfo: $peInfo)
             }
+            .sheet(isPresented: $showingSettings) {
+                WineSettingsView(config: $wineConfig)
+            }
         }
     }
     
     func runSelectedEXE() {
         guard let file = selectedFile else { return }
         
+        // Create container if needed
+        if currentContainer == nil {
+            currentContainer = WineEngine.WineContainer(name: "Default")
+        }
+        
+        guard let container = currentContainer else { return }
+        
         isRunning = true
-        consoleOutput = "🍷 Starting Wine emulation...\n"
+        consoleOutput = "🍷 Starting Wine Engine...\n"
+        consoleOutput += "🍷 Container: \(container.name)\n"
+        consoleOutput += "🍷 Resolution: \(wineConfig.desktopResolution)\n"
+        consoleOutput += "🍷 Graphics: \(wineConfig.graphicsDriver)\n"
         consoleOutput += "🍷 Loading: \(file.lastPathComponent)\n"
         consoleOutput += "🍷 Path: \(file.path)\n"
-        consoleOutput += "🍷 Initializing Wine layer...\n"
-        consoleOutput += "🍷 Setting up Windows environment...\n"
+        consoleOutput += "🍷 Initializing Wine environment...\n"
         
         DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
-            let result = wineLauncher.launch(exePath: file.path)
+            let result = wineEngine.execute(exePath: file.path, in: container, config: wineConfig)
             consoleOutput += result.message + "\n"
             
-            if case .success = result {
-                consoleOutput += "\n🍷 === Windows Application Running ===\n"
-                consoleOutput += "🍷 Wine compatibility layer active\n"
-                consoleOutput += "🍷 Windows API translation working\n"
-                consoleOutput += "🍷 File system redirection active\n"
-                consoleOutput += "🍷 Application interface loaded\n"
-            }
-            
-            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+            DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
                 isRunning = false
                 consoleOutput += "\n🍷 Wine session completed!\n"
             }
@@ -469,6 +492,84 @@ struct DocumentPicker: UIViewControllerRepresentable {
             // Analyze PE file
             let peInfo = PELoader.getExecutableInfo(atPath: url.path)
             parent.peInfo = peInfo
+        }
+    }
+}
+
+// Winlator-style Settings View
+struct WineSettingsView: View {
+    @Binding var config: WineEngine.WineConfig
+    @Environment(\.presentationMode) var presentationMode
+    
+    let resolutions = ["800x600", "1024x768", "1280x720", "1920x1080", "2560x1440"]
+    let windowsVersions = ["Windows XP", "Windows 7", "Windows 8.1", "Windows 10", "Windows 11"]
+    let graphicsDrivers = ["OpenGL", "Vulkan", "Direct3D"]
+    let soundDrivers = ["PulseAudio", "ALSA", "OSS"]
+    
+    var body: some View {
+        NavigationView {
+            Form {
+                Section(header: Text("Windows Settings")) {
+                    Picker("Windows Version", selection: $config.windowsVersion) {
+                        ForEach(windowsVersions, id: \.self) { version in
+                            Text(version).tag(version)
+                        }
+                    }
+                }
+                
+                Section(header: Text("Display Settings")) {
+                    Picker("Resolution", selection: $config.desktopResolution) {
+                        ForEach(resolutions, id: \.self) { resolution in
+                            Text(resolution).tag(resolution)
+                        }
+                    }
+                    
+                    Picker("Graphics Driver", selection: $config.graphicsDriver) {
+                        ForEach(graphicsDrivers, id: \.self) { driver in
+                            Text(driver).tag(driver)
+                        }
+                    }
+                }
+                
+                Section(header: Text("Audio Settings")) {
+                    Picker("Sound Driver", selection: $config.soundDriver) {
+                        ForEach(soundDrivers, id: \.self) { driver in
+                            Text(driver).tag(driver)
+                        }
+                    }
+                }
+                
+                Section(header: Text("Container Management")) {
+                    Button("Create New Container") {
+                        // Create new container logic
+                    }
+                    .foregroundColor(.blue)
+                    
+                    Button("Reset Container") {
+                        // Reset container logic
+                    }
+                    .foregroundColor(.orange)
+                }
+                
+                Section(header: Text("Advanced")) {
+                    Button("Export Container") {
+                        // Export logic
+                    }
+                    .foregroundColor(.blue)
+                    
+                    Button("Import Container") {
+                        // Import logic
+                    }
+                    .foregroundColor(.blue)
+                }
+            }
+            .navigationTitle("Wine Settings")
+            .navigationBarTitleDisplayMode(.inline)
+            .navigationBarItems(
+                trailing: Button("Done") {
+                    presentationMode.wrappedValue.dismiss()
+                }
+            )
         }
     }
 }
