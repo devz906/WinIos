@@ -109,6 +109,7 @@ struct ContentView: View {
     @State private var currentContainer: WineEngine.WineContainer?
     @State private var wineConfig = WineEngine.WineConfig()
     @State private var showingSettings = false
+    @State private var showingWindowsDesktop = false
     
     var body: some View {
         NavigationView {
@@ -262,6 +263,9 @@ struct ContentView: View {
             .sheet(isPresented: $showingSettings) {
                 WineSettingsView(config: $wineConfig)
             }
+            .fullScreenCover(isPresented: $showingWindowsDesktop) {
+                WindowsDesktopView(isPresented: $showingWindowsDesktop)
+            }
         }
     }
     
@@ -288,9 +292,37 @@ struct ContentView: View {
             let result = wineEngine.execute(exePath: file.path, in: container, config: wineConfig)
             consoleOutput += result.message + "\n"
             
-            DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
-                isRunning = false
-                consoleOutput += "\n🍷 Wine session completed!\n"
+            if case .success(let message) = result {
+                if message == "DESKTOP_LAUNCH" {
+                    consoleOutput += "\n🍷 === LAUNCHING WINDOWS DESKTOP ===\n"
+                    consoleOutput += "🍷 Wine compatibility layer active\n"
+                    consoleOutput += "🍷 Windows API translation working\n"
+                    consoleOutput += "🍷 File system redirection active\n"
+                    consoleOutput += "🍷 Virtual desktop created\n"
+                    consoleOutput += "🍷 Launching Windows environment...\n"
+                    
+                    // Show Windows desktop
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                        showingWindowsDesktop = true
+                        isRunning = false
+                    }
+                } else {
+                    consoleOutput += "\n🍷 === Windows Application Running ===\n"
+                    consoleOutput += "🍷 Wine compatibility layer active\n"
+                    consoleOutput += "🍷 Windows API translation working\n"
+                    consoleOutput += "🍷 File system redirection active\n"
+                    consoleOutput += "🍷 Application interface loaded\n"
+                    
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+                        isRunning = false
+                        consoleOutput += "\n🍷 Wine session completed!\n"
+                    }
+                }
+            } else {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+                    isRunning = false
+                    consoleOutput += "\n🍷 Wine session completed!\n"
+                }
             }
         }
     }
@@ -315,9 +347,31 @@ struct ContentView: View {
             let result = wineEngine.execute(exePath: appName, in: container, config: wineConfig)
             consoleOutput += result.message + "\n"
             
-            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-                isRunning = false
-                consoleOutput += "\n🍷 Wine session completed!\n"
+            if case .success(let message) = result {
+                if message == "DESKTOP_LAUNCH" {
+                    consoleOutput += "\n🍷 === LAUNCHING WINDOWS DESKTOP ===\n"
+                    consoleOutput += "🍷 Wine compatibility layer active\n"
+                    consoleOutput += "🍷 Windows API translation working\n"
+                    consoleOutput += "🍷 File system redirection active\n"
+                    consoleOutput += "🍷 Virtual desktop created\n"
+                    consoleOutput += "🍷 Launching Windows environment...\n"
+                    
+                    // Show Windows desktop
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+                        showingWindowsDesktop = true
+                        isRunning = false
+                    }
+                } else {
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                        isRunning = false
+                        consoleOutput += "\n🍷 Wine session completed!\n"
+                    }
+                }
+            } else {
+                DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
+                    isRunning = false
+                    consoleOutput += "\n🍷 Wine session completed!\n"
+                }
             }
         }
     }

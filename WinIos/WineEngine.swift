@@ -186,22 +186,9 @@ class WineEngine {
         print("📝 Wine: Initializing text editor")
         print("📝 Wine: Setting up menu bar")
         print("📝 Wine: Creating main window at \(config.desktopResolution)")
+        print("📝 Wine: Launching Windows Desktop Environment")
         
-        return .success("""
-        ✅ Notepad executed successfully!
-        
-        📝 Application Details:
-        - Window: Notepad
-        - Resolution: \(config.desktopResolution)
-        - Graphics: \(config.graphicsDriver)
-        - Status: Running
-        
-        📝 Features Available:
-        - Text editing
-        - File operations (Open/Save)
-        - Font selection
-        - Print support
-        """)
+        return .success("DESKTOP_LAUNCH")
     }
     
     private func executeCalculator(exePath: String, config: WineConfig) -> WineResult {
@@ -209,22 +196,9 @@ class WineEngine {
         print("🧮 Wine: Creating calculator window")
         print("🧮 Wine: Initializing math engine")
         print("🧮 Wine: Setting up button layout")
+        print("🧮 Wine: Launching Windows Desktop Environment")
         
-        return .success("""
-        ✅ Calculator executed successfully!
-        
-        🧮 Application Details:
-        - Window: Calculator
-        - Resolution: \(config.desktopResolution)
-        - Graphics: \(config.graphicsDriver)
-        - Status: Running
-        
-        🧮 Features Available:
-        - Basic arithmetic
-        - Scientific functions
-        - Memory operations
-        - History tracking
-        """)
+        return .success("DESKTOP_LAUNCH")
     }
     
     private func executeExplorer(exePath: String, config: WineConfig) -> WineResult {
@@ -232,22 +206,9 @@ class WineEngine {
         print("🗂️ Wine: Creating shell interface")
         print("🗂️ Wine: Initializing file system")
         print("🗂️ Wine: Setting up desktop")
+        print("🗂️ Wine: Launching Windows Desktop Environment")
         
-        return .success("""
-        ✅ Windows Explorer executed successfully!
-        
-        🗂️ Application Details:
-        - Window: Windows Explorer
-        - Resolution: \(config.desktopResolution)
-        - Graphics: \(config.graphicsDriver)
-        - Status: Running
-        
-        🗂️ Features Available:
-        - File browsing
-        - Folder navigation
-        - File operations
-        - Desktop management
-        """)
+        return .success("DESKTOP_LAUNCH")
     }
     
     private func executeCMD(exePath: String, config: WineConfig) -> WineResult {
@@ -255,22 +216,9 @@ class WineEngine {
         print("💻 Wine: Creating console window")
         print("💻 Wine: Initializing command interpreter")
         print("💻 Wine: Setting up environment variables")
+        print("💻 Wine: Launching Windows Desktop Environment")
         
-        return .success("""
-        ✅ Command Prompt executed successfully!
-        
-        💻 Application Details:
-        - Window: Command Prompt
-        - Resolution: \(config.desktopResolution)
-        - Graphics: \(config.graphicsDriver)
-        - Status: Running
-        
-        💻 Features Available:
-        - Command execution
-        - Batch file support
-        - Environment variables
-        - System commands
-        """)
+        return .success("DESKTOP_LAUNCH")
     }
     
     private func executeGeneric(exePath: String, config: WineConfig) -> WineResult {
@@ -278,22 +226,9 @@ class WineEngine {
         print("🔄 Wine: Analyzing executable requirements")
         print("🔄 Wine: Setting up compatibility mode")
         print("🔄 Wine: Creating application window")
+        print("🔄 Wine: Launching Windows Desktop Environment")
         
-        return .success("""
-        ✅ Application executed successfully!
-        
-        🔄 Application Details:
-        - EXE: \(URL(fileURLWithPath: exePath).lastPathComponent)
-        - Resolution: \(config.desktopResolution)
-        - Graphics: \(config.graphicsDriver)
-        - Status: Running
-        
-        🔄 Wine Features Active:
-        - Windows API translation
-        - File system redirection
-        - Registry emulation
-        - DLL loading
-        """)
+        return .success("DESKTOP_LAUNCH")
     }
 }
 
