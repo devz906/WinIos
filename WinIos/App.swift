@@ -264,7 +264,7 @@ struct ContentView: View {
                 WineSettingsView(config: $wineConfig)
             }
             .fullScreenCover(isPresented: $showingWindowsDesktop) {
-                WindowsDesktopView(isPresented: $showingWindowsDesktop)
+                WinlatorDesktopView(isPresented: $showingWindowsDesktop)
             }
         }
     }
