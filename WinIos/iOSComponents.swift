@@ -112,8 +112,7 @@ class iOSWindowsAPI {
         print("🍷 iOS Windows API: Translating Windows calls to iOS")
         
         // Check PE header
-        let peLoader = PELoader()
-        let peInfo = peLoader.getExecutableInfo(atPath: "temp.exe")
+        let peInfo = PELoader.getExecutableInfo(atPath: "temp.exe")
         
         // Simulate Windows API calls
         let apiCalls = [
