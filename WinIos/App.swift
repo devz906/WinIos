@@ -14,6 +14,7 @@ struct ContentView: View {
     @State private var selectedFile: String?
     @State private var isRunning = false
     @State private var consoleOutput = ""
+    @State private var wineLauncher = WineLauncher()
     
     var body: some View {
         NavigationView {
@@ -29,6 +30,9 @@ struct ContentView: View {
                     Text("Windows App Emulator for iOS")
                         .font(.subheadline)
                         .foregroundColor(.secondary)
+                    Text("Powered by Wine")
+                        .font(.caption)
+                        .foregroundColor(.purple)
                 }
                 .padding()
                 
@@ -38,7 +42,7 @@ struct ContentView: View {
                         Circle()
                             .fill(isRunning ? .green : .red)
                             .frame(width: 10, height: 10)
-                        Text(isRunning ? "Emulator Running" : "Ready")
+                        Text(isRunning ? "Wine Running" : "Ready")
                             .font(.caption)
                     }
                     
@@ -69,19 +73,43 @@ struct ContentView: View {
                 Button(action: runApplication) {
                     HStack {
                         Image(systemName: "play.circle.fill")
-                        Text("Run Windows App")
+                        Text("Run with Wine")
                     }
                     .font(.headline)
                     .foregroundColor(.white)
                     .padding()
-                    .background(selectedFile != nil ? Color.blue : Color.gray)
+                    .background(selectedFile != nil ? Color.purple : Color.gray)
                     .cornerRadius(10)
                 }
                 .disabled(selectedFile == nil || isRunning)
                 
+                // Quick Actions
+                VStack(alignment: .leading, spacing: 10) {
+                    Text("Quick Test:")
+                        .font(.headline)
+                    
+                    HStack(spacing: 10) {
+                        Button("Test IMG Tool") {
+                            testIMGTool()
+                        }
+                        .padding(.horizontal)
+                        .padding(.vertical, 8)
+                        .background(Color.blue.opacity(0.1))
+                        .cornerRadius(6)
+                        
+                        Button("Test TXD Tool") {
+                            testTXDTool()
+                        }
+                        .padding(.horizontal)
+                        .padding(.vertical, 8)
+                        .background(Color.green.opacity(0.1))
+                        .cornerRadius(6)
+                    }
+                }
+                
                 // Console Output
                 VStack(alignment: .leading, spacing: 5) {
-                    Text("Console Output:")
+                    Text("Wine Console:")
                         .font(.headline)
                     
                     ScrollView {
@@ -107,30 +135,45 @@ struct ContentView: View {
     func selectFile() {
         // TODO: Implement file picker
         selectedFile = "IMGTool.exe"
-        consoleOutput = "Selected: IMGTool.exe\nReady to run..."
+        consoleOutput = "🍷 Selected: IMGTool.exe\n🍷 Ready to run with Wine...\n"
     }
     
     func runApplication() {
         guard let file = selectedFile else { return }
         
         isRunning = true
-        consoleOutput = "Starting Windows emulation...\n"
-        consoleOutput += "Loading: \(file)\n"
-        consoleOutput += "Initializing Wine layer...\n"
-        consoleOutput += "Setting up x86 emulation...\n"
+        consoleOutput = "🍷 Starting Wine emulation...\n"
+        consoleOutput += "🍷 Loading: \(file)\n"
+        consoleOutput += "🍷 Initializing Wine layer...\n"
+        consoleOutput += "🍷 Setting up Windows environment...\n"
         
-        DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
-            consoleOutput += "Windows API translation ready\n"
-            consoleOutput += "File system redirected\n"
-            consoleOutput += "Application started!\n"
-            consoleOutput += "\n=== Windows App Running ===\n"
-            consoleOutput += "IMG Tool interface loaded\n"
-            consoleOutput += "Ready to process GTA archives\n"
+        DispatchQueue.main.asyncAfter(deadline: .now() + 1) {
+            let result = wineLauncher.launch(exePath: file)
+            consoleOutput += result.message + "\n"
             
-            DispatchQueue.main.asyncAfter(deadline: .now() + 3) {
+            if case .success = result {
+                consoleOutput += "\n🍷 === Windows Application Running ===\n"
+                consoleOutput += "🍷 Wine compatibility layer active\n"
+                consoleOutput += "🍷 Windows API translation working\n"
+                consoleOutput += "🍷 File system redirection active\n"
+            }
+            
+            DispatchQueue.main.asyncAfter(deadline: .now() + 2) {
                 isRunning = false
-                consoleOutput += "\nApplication completed successfully!\n"
+                consoleOutput += "\n🍷 Wine session completed!\n"
             }
         }
+    }
+    
+    func testIMGTool() {
+        selectedFile = "IMGTool.exe"
+        consoleOutput = "🍷 Testing IMG Tool with Wine...\n"
+        runApplication()
+    }
+    
+    func testTXDTool() {
+        selectedFile = "TXDTool.exe"
+        consoleOutput = "🍷 Testing TXD Tool with Wine...\n"
+        runApplication()
     }
 }
